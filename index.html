@@ -206,8 +206,8 @@
   .ambig-node{cursor:pointer;}
   .ambiguity-hit{fill:transparent;stroke:none;pointer-events:all;}
   .ambig-node .word,.ambig-node .tag{transition:opacity .16s ease,text-shadow .16s ease;}
-  body.has-tree .ambig-node .word{animation:ambiguity-flash 3.8s ease-in-out .9s 2;}
-  body.has-tree .ambig-node .tag{animation:ambiguity-tag-flash 3.8s ease-in-out .9s 2;}
+  body.has-tree .ambig-node .word{animation:ambiguity-flash 3.8s ease-in-out var(--pulse-delay,.9s) 2;}
+  body.has-tree .ambig-node .tag{animation:ambiguity-tag-flash 3.8s ease-in-out var(--pulse-delay,.9s) 2;}
   .ambig-node:hover .word,.ambig-node:focus-visible .word{text-shadow:0 0 7px currentColor;}
   .ambig-node:hover .tag,.ambig-node:focus-visible .tag{opacity:1;}
   #toast{
@@ -218,6 +218,17 @@
     backdrop-filter:blur(8px);
   }
   #toast.show{opacity:1;transform:translate(-50%,0);}
+  #notice{
+    position:fixed;left:50%;bottom:max(70px,calc(env(safe-area-inset-bottom) + 56px));z-index:16;
+    transform:translate(-50%,12px);opacity:0;visibility:hidden;pointer-events:none;
+    max-width:min(440px,calc(100vw - 32px));text-align:center;
+    color:var(--ink);background:var(--panel);border:1px solid var(--hairline);border-radius:14px;
+    padding:12px 20px;box-shadow:0 6px 26px rgba(0,0,0,.16);
+    font:400 clamp(14px,2.4vw,17px)/1.4 'Atkinson Hyperlegible',ui-sans-serif,system-ui,sans-serif;
+    backdrop-filter:blur(10px);
+    transition:opacity .34s ease,transform .34s ease,visibility .34s ease;
+  }
+  #notice.show{opacity:1;transform:translate(-50%,0);visibility:visible;}
   .draw-item{opacity:0;transform:translateY(-18px);animation:diagram-down .42s cubic-bezier(.2,.8,.2,1) forwards;}
   .branch path,.branch line{stroke-dasharray:1;stroke-dashoffset:1;}
   .branch.draw-item path,.branch.draw-item line{animation:diagram-line .46s ease forwards;animation-delay:inherit;}
@@ -258,7 +269,7 @@
     #sentenceExpand{width:22px;height:22px;}
   }
   @media (prefers-reduced-motion:reduce){
-    #prompt,#controls,.sentence,#sentenceOverlay,#exportOverlay,#infoOverlay,.draw-item,.branch.draw-item path,.branch.draw-item line,.example-chip,.ambig-node .word,.ambig-node .tag{animation:none;transition:none;}
+    #prompt,#controls,.sentence,#sentenceOverlay,#exportOverlay,#infoOverlay,#notice,.draw-item,.branch.draw-item path,.branch.draw-item line,.example-chip,.ambig-node .word,.ambig-node .tag{animation:none;transition:none;}
     .draw-item,.sentence{opacity:1;transform:none;}
     .example-chip{opacity:.68;transform:none;}
     body.has-tree #prompt{opacity:0;visibility:hidden;}
@@ -337,6 +348,7 @@
   </div>
 </div>
 <div id="toast" aria-hidden="true"></div>
+<div id="notice" role="status" aria-live="polite"></div>
 <div class="sr-only" id="sr" aria-live="polite"></div>
 
 <script src="vendor/rough.js"></script>
@@ -701,6 +713,7 @@
         svg.appendChild(animateItem(el('line',{x1:lk.a.x,y1:lk.a.y+20,x2:lk.b.x,y2:lk.b.y-g,stroke:ink,'stroke-width':strokeWidth}),lk.b._depth,'branch'));
       });
     }
+    var ambigSeen=0;
     lay.nodes.forEach(function(n){
       var g=el('g',{});
       if(n.children&&n.children.length){
@@ -714,6 +727,9 @@
           g.setAttribute('role','button');
           g.setAttribute('aria-label','Change part of speech for '+n.word);
           g.appendChild(el('title',{},'Change part of speech: '+n.candidates.join(' / ')));
+          // Stagger the pulse so multiple changeable words never fire in unison:
+          // chain down the tree (upper nodes first) with a small ordinal tiebreaker.
+          g.style.setProperty('--pulse-delay',(0.9+(n._depth||0)*0.14+(ambigSeen++)*0.06).toFixed(2)+'s');
         }
         g.appendChild(el('text',{x:n.x,y:n.y-15,'text-anchor':'middle',class:'tag',fill:'var(--muted)','font-size':'15px'},n.tag));
         g.appendChild(el('text',{x:n.x,y:n.y+22,'text-anchor':'middle',class:'word',fill:'var(--ink)','font-size':'22px'},n.word));
@@ -855,6 +871,9 @@
     sentenceFull.textContent=display;
     window.requestAnimationFrame(updateSentenceOverflow);
     sr.textContent='Parsed: '+text;
+    var changeable=0;
+    for(var ci=0;ci<toks.length;ci++){if(toks[ci].candidates&&toks[ci].candidates.length>1)changeable++;}
+    maybeFirstTimeHint(changeable);
   }
 
   var THEMES=[
@@ -1164,6 +1183,27 @@
     clearTimeout(toastTimer);
     toastTimer=setTimeout(function(){t.classList.remove('show');},1300);
   }
+  var noticeTimer=null;
+  function showNotice(text,duration){
+    var n=document.getElementById('notice');
+    if(!n)return;
+    n.textContent=text;
+    n.classList.add('show');
+    clearTimeout(noticeTimer);
+    noticeTimer=setTimeout(function(){n.classList.remove('show');},duration||3600);
+  }
+  var POS_LABEL={N:'noun',V:'verb',Adj:'adjective',Adv:'adverb',P:'preposition',
+    Aux:'auxiliary',Det:'determiner',Num:'number',Pron:'pronoun',Conj:'conjunction'};
+  function posLabel(p){return POS_LABEL[p]||p;}
+  var FIRST_HINT_KEY='syntaxtree.posHint.v1';
+  function maybeFirstTimeHint(count){
+    if(!count)return;
+    var seen=false;
+    try{seen=localStorage.getItem(FIRST_HINT_KEY)==='1';}catch(e){}
+    if(seen)return;
+    try{localStorage.setItem(FIRST_HINT_KEY,'1');}catch(e){}
+    showNotice('Glowing words have more than one part of speech — tap one to change it.',5200);
+  }
   function cycleAmbiguity(idx){
     var tok=currentTokens[idx];
     if(!tok||!tok.candidates||tok.candidates.length<2)return;
@@ -1172,8 +1212,8 @@
     if(next===tok.basePos)delete posOverrides[idx];else posOverrides[idx]=next;
     run(currentText);
     updateShareUrl(currentText);
-    sr.textContent='Set '+tok.w+' to '+next+'.';
-    showToast(tok.w+' → '+next);
+    sr.textContent='Set '+tok.w+' to '+posLabel(next)+'.';
+    showNotice(posLabel(current)+' → '+posLabel(next),2600);
   }
   function ambiguityTarget(node){
     while(node&&node!==svg){

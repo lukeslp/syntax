@@ -31,7 +31,7 @@
   :root{
     --bg:#fbfbfa; --ink:#151515; --muted:#77736d; --line:#202020;
     --hairline:rgba(21,21,21,.16); --panel:rgba(251,251,250,.92);
-    --control-bg:rgba(251,251,250,.72); --stroke-width:1.25; --roughness:1.15;
+    --control-bg:rgba(251,251,250,.72); --stroke-width:1.25; --roughness:1.15; --bowing:1;
   }
   *{box-sizing:border-box;margin:0;padding:0;}
   html,body{height:100%;}
@@ -701,11 +701,12 @@
     var ink=styles.getPropertyValue('--line').trim()||'#202020';
     var strokeWidth=parseFloat(styles.getPropertyValue('--stroke-width'))||1.25;
     var roughness=parseFloat(styles.getPropertyValue('--roughness'))||1.15;
+    var bowing=parseFloat(styles.getPropertyValue('--bowing'))||1;
     if(window.rough){
       var rc=window.rough.svg(svg);
       lay.links.forEach(function(lk){
         var g=(lk.b.children&&lk.b.children.length)?20:34;
-        svg.appendChild(animateItem(rc.line(lk.a.x,lk.a.y+20,lk.b.x,lk.b.y-g,{stroke:ink,strokeWidth:strokeWidth,roughness:roughness,bowing:1}),lk.b._depth,'branch'));
+        svg.appendChild(animateItem(rc.line(lk.a.x,lk.a.y+20,lk.b.x,lk.b.y-g,{stroke:ink,strokeWidth:strokeWidth,roughness:roughness,bowing:bowing}),lk.b._depth,'branch'));
       });
     }else{
       lay.links.forEach(function(lk){
@@ -881,7 +882,7 @@
     {name:'marker',fx:'fx-marker',v:{'--bg':'#f4f6f8','--ink':'#15623e','--muted':'rgba(26,92,60,.72)','--line':'#1f8a5b','--hairline':'rgba(31,138,91,.28)','--panel':'rgba(244,246,248,.94)','--control-bg':'rgba(244,246,248,.74)','--stroke-width':'1.45','--roughness':'1.05'}},
     {name:'board',fx:'fx-board',v:{'--bg':'#ffffff','--ink':'#0f3f80','--muted':'rgba(15,63,128,.62)','--line':'#155bb0','--hairline':'rgba(20,90,170,.26)','--panel':'rgba(255,255,255,.94)','--control-bg':'rgba(255,255,255,.74)','--stroke-width':'1.25','--roughness':'1.0'}},
     {name:'paper',fx:'fx-paper',v:{'--bg':'#fbfaf6','--ink':'#4a4f57','--muted':'rgba(74,79,87,.6)','--line':'#6b7078','--hairline':'rgba(74,79,87,.22)','--panel':'rgba(251,250,246,.94)','--control-bg':'rgba(251,250,246,.76)','--stroke-width':'1.05','--roughness':'1.65'}},
-    {name:'sharpie',fx:'fx-sharpie',v:{'--bg':'#fdfdf9','--ink':'#070707','--muted':'rgba(7,7,7,.6)','--line':'#050505','--hairline':'rgba(7,7,7,.2)','--panel':'rgba(253,253,249,.94)','--control-bg':'rgba(253,253,249,.78)','--stroke-width':'2.35','--roughness':'1.22'}}
+    {name:'sharpie',fx:'fx-sharpie',v:{'--bg':'#fdfdf9','--ink':'#050505','--muted':'rgba(5,5,5,.72)','--line':'#000000','--hairline':'rgba(5,5,5,.28)','--panel':'rgba(253,253,249,.94)','--control-bg':'rgba(253,253,249,.78)','--stroke-width':'3.1','--roughness':'1.9','--bowing':'1.9'}}
   ];
   function themeIndexByName(name){
     for(var i=0;i<THEMES.length;i++)if(THEMES[i].name===name)return i;
@@ -910,6 +911,7 @@
   }
   function applyTheme(redraw){
     var t=THEMES[((themeIndex%THEMES.length)+THEMES.length)%THEMES.length],rs=document.documentElement.style;
+    rs.removeProperty('--bowing'); // only some themes (sharpie) override this; fall back to :root default otherwise
     for(var k in t.v)rs.setProperty(k,t.v[k]);
     THEMES.forEach(function(x){if(x.fx)document.body.classList.remove(x.fx);});
     if(t.fx)document.body.classList.add(t.fx);

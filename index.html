@@ -45,6 +45,9 @@
   body.fx-marker .tag,body.fx-marker .word,body.fx-marker .sentence,
   body.fx-board .tag,body.fx-board .word,body.fx-board .sentence,
   body.fx-sharpie .tag,body.fx-sharpie .word,body.fx-sharpie .sentence{font-family:'Permanent Marker',cursive;}
+  body.fx-chalk #sentenceFull,body.fx-paper #sentenceFull{font-family:'Gloria Hallelujah',cursive;}
+  body.fx-marker #sentenceFull,body.fx-board #sentenceFull,
+  body.fx-sharpie #sentenceFull{font-family:'Permanent Marker',cursive;}
   body.fx-chalk{
     background-image:
       radial-gradient(circle at 18% 22%,rgba(255,255,255,.045),transparent 22%),
@@ -60,11 +63,7 @@
       repeating-linear-gradient(0deg,transparent 0 29px,rgba(88,132,196,.18) 29px 30px);
   }
   body.fx-sharpie{
-    background-image:
-      radial-gradient(circle at 18% 24%,rgba(0,0,0,.022),transparent 18%),
-      radial-gradient(circle at 76% 72%,rgba(0,0,0,.018),transparent 22%),
-      repeating-linear-gradient(0deg,transparent 0 29px,rgba(30,30,30,.045) 29px 30px),
-      repeating-linear-gradient(90deg,rgba(0,0,0,.012) 0 1px,transparent 1px 9px);
+    background-image:none;
   }
   body.fx-chalk::after{
     content:"";position:fixed;inset:0;pointer-events:none;z-index:1;opacity:.42;
@@ -342,8 +341,9 @@
     <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12"/><path d="M18 6 6 18"/></svg>
   </button>
   <div id="infoPanel">
-    <p>This is a tiny phrase-structure sketcher. It tokenizes your sentence with <a href="https://github.com/spencermountain/compromise" rel="noopener">compromise</a>, folds the tags into a simplified constituency grammar, then draws the tree as rough SVG in your browser.</p>
-    <p>Ambiguous words can be tapped when the parser has a constrained alternate tag. It is not a linguist. It is a legible toy model.</p>
+    <p>Type a sentence and it draws a tree that shows how the words group together — which words are the subject, which are the action, and so on.</p>
+    <p>It all happens right here in your browser, with no AI. A small dictionary tool called <a href="https://github.com/spencermountain/compromise" rel="noopener">compromise</a> labels the words, and a few simple rules build the tree.</p>
+    <p>Glowing words can be more than one part of speech — tap one to switch it. It's a friendly toy, not a linguist.</p>
     <p><a href="https://lukesteuber.com/" rel="noopener">lukesteuber.com</a> / <a href="https://datapoems.io/" rel="noopener">datapoems.io</a> / <a href="https://diachronica.com/" rel="noopener">diachronica.com</a></p>
   </div>
 </div>
@@ -882,7 +882,7 @@
     {name:'marker',fx:'fx-marker',v:{'--bg':'#f4f6f8','--ink':'#15623e','--muted':'rgba(26,92,60,.72)','--line':'#1f8a5b','--hairline':'rgba(31,138,91,.28)','--panel':'rgba(244,246,248,.94)','--control-bg':'rgba(244,246,248,.74)','--stroke-width':'1.45','--roughness':'1.05'}},
     {name:'board',fx:'fx-board',v:{'--bg':'#ffffff','--ink':'#0f3f80','--muted':'rgba(15,63,128,.62)','--line':'#155bb0','--hairline':'rgba(20,90,170,.26)','--panel':'rgba(255,255,255,.94)','--control-bg':'rgba(255,255,255,.74)','--stroke-width':'1.25','--roughness':'1.0'}},
     {name:'paper',fx:'fx-paper',v:{'--bg':'#fbfaf6','--ink':'#4a4f57','--muted':'rgba(74,79,87,.6)','--line':'#6b7078','--hairline':'rgba(74,79,87,.22)','--panel':'rgba(251,250,246,.94)','--control-bg':'rgba(251,250,246,.76)','--stroke-width':'1.05','--roughness':'1.65'}},
-    {name:'sharpie',fx:'fx-sharpie',v:{'--bg':'#fdfdf9','--ink':'#050505','--muted':'rgba(5,5,5,.72)','--line':'#000000','--hairline':'rgba(5,5,5,.28)','--panel':'rgba(253,253,249,.94)','--control-bg':'rgba(253,253,249,.78)','--stroke-width':'3.1','--roughness':'1.9','--bowing':'1.9'}}
+    {name:'sharpie',fx:'fx-sharpie',v:{'--bg':'#ffffff','--ink':'#000000','--muted':'rgba(0,0,0,.72)','--line':'#000000','--hairline':'rgba(0,0,0,.26)','--panel':'rgba(255,255,255,.97)','--control-bg':'rgba(255,255,255,.82)','--stroke-width':'3.1','--roughness':'1.9','--bowing':'1.9'}}
   ];
   function themeIndexByName(name){
     for(var i=0;i<THEMES.length;i++)if(THEMES[i].name===name)return i;

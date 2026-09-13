@@ -10,12 +10,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Syntax Tree: diagram a sentence</title>
 <meta name="description" content="Enter a sentence and watch its phrase-structure tree diagram itself downward.">
-<link rel="icon" type="image/png" href="social-card-board.png">
-<link rel="canonical" href="https://datapoems.io/syntax/">
+<link rel="canonical" href="https://datapoems.io/datavis/syntax/">
 <meta property="og:type" content="website">
 <meta property="og:title" content="Syntax Tree">
 <meta property="og:description" content="Make a phrase-structure diagram for any sentence.">
-<meta property="og:url" content="https://datapoems.io/syntax/">
+<meta property="og:url" content="https://datapoems.io/datavis/syntax/">
 <meta property="og:image" content="https://datapoems.io/syntax/social-card-board.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
@@ -31,7 +30,7 @@
   :root{
     --bg:#fbfbfa; --ink:#151515; --muted:#77736d; --line:#202020;
     --hairline:rgba(21,21,21,.16); --panel:rgba(251,251,250,.92);
-    --control-bg:rgba(251,251,250,.72); --stroke-width:1.25; --roughness:1.15; --bowing:1;
+    --control-bg:rgba(251,251,250,.72); --stroke-width:1.25; --roughness:1.15;
   }
   *{box-sizing:border-box;margin:0;padding:0;}
   html,body{height:100%;}
@@ -40,14 +39,11 @@
     font-family:'Atkinson Hyperlegible',ui-sans-serif,system-ui,sans-serif;
     display:flex;flex-direction:column;
   }
-  body.fx-chalk .tag,body.fx-chalk .word,body.fx-chalk .sentence,
-  body.fx-paper .tag,body.fx-paper .word,body.fx-paper .sentence{font-family:'Gloria Hallelujah',cursive;}
+  body.fx-chalk .tag,body.fx-chalk .word,body.fx-chalk .sentence{font-family:'Gloria Hallelujah',cursive;}
   body.fx-marker .tag,body.fx-marker .word,body.fx-marker .sentence,
   body.fx-board .tag,body.fx-board .word,body.fx-board .sentence,
+  body.fx-paper .tag,body.fx-paper .word,body.fx-paper .sentence,
   body.fx-sharpie .tag,body.fx-sharpie .word,body.fx-sharpie .sentence{font-family:'Permanent Marker',cursive;}
-  body.fx-chalk #sentenceFull,body.fx-paper #sentenceFull{font-family:'Gloria Hallelujah',cursive;}
-  body.fx-marker #sentenceFull,body.fx-board #sentenceFull,
-  body.fx-sharpie #sentenceFull{font-family:'Permanent Marker',cursive;}
   body.fx-chalk{
     background-image:
       radial-gradient(circle at 18% 22%,rgba(255,255,255,.045),transparent 22%),
@@ -56,14 +52,22 @@
       repeating-linear-gradient(0deg,rgba(255,255,255,.018) 0 1px,transparent 1px 5px),
       repeating-linear-gradient(90deg,rgba(0,0,0,.035) 0 1px,transparent 1px 7px);
   }
+  body.fx-midnight{background-image:radial-gradient(ellipse at 70% 25%,rgba(87,46,131,.22),transparent 65%),radial-gradient(ellipse at 35% 65%,rgba(30,67,133,.26),transparent 70%);}
+  body.fx-midnight .branch{filter:drop-shadow(0 0 2px #56b5ee44);}
+  body.bare{padding:3vh 4vw 14vh;}
+  body.bare #controls,body.bare .sentence{display:none;}
   body.fx-marker{background-image:repeating-linear-gradient(0deg,transparent 0 31px,rgba(110,110,110,.10) 31px 32px);}
   body.fx-paper{
     background-image:
-      linear-gradient(90deg,transparent 0 62px,rgba(216,88,88,.30) 62px 64px,transparent 64px),
-      repeating-linear-gradient(0deg,transparent 0 29px,rgba(88,132,196,.18) 29px 30px);
+      repeating-linear-gradient(0deg,transparent 0 29px,rgba(0,0,0,.026) 29px 30px),
+      repeating-linear-gradient(90deg,rgba(0,0,0,.010) 0 1px,transparent 1px 9px);
   }
   body.fx-sharpie{
-    background-image:none;
+    background-image:
+      radial-gradient(circle at 18% 24%,rgba(0,0,0,.022),transparent 18%),
+      radial-gradient(circle at 76% 72%,rgba(0,0,0,.018),transparent 22%),
+      repeating-linear-gradient(0deg,transparent 0 29px,rgba(30,30,30,.045) 29px 30px),
+      repeating-linear-gradient(90deg,rgba(0,0,0,.012) 0 1px,transparent 1px 9px);
   }
   body.fx-chalk::after{
     content:"";position:fixed;inset:0;pointer-events:none;z-index:1;opacity:.42;
@@ -110,26 +114,17 @@
     opacity:.72;padding:6px 2px;
   }
   #surprise:hover,#surprise:focus-visible{opacity:1;outline:none;color:var(--ink);}
-  /* Hide with visibility (not display) so the reserved space never collapses
-     and the input above stays put while typing. */
-  body.input-has-text #example-stream{visibility:hidden;}
+  body.input-has-text #example-stream{display:none;}
   #example-stream{
-    --example-row: 28px;
-    --example-count: 10;
     margin-top:18px;display:flex;flex-direction:column;align-items:stretch;gap:0;max-width:min(760px,100%);
-    height:calc(var(--example-row) * var(--example-count));
-    flex:0 0 auto;overflow:hidden;
-    -webkit-mask-image:linear-gradient(to bottom,transparent 0,#000 22%,#000 100%);
-    mask-image:linear-gradient(to bottom,transparent 0,#000 22%,#000 100%);
-    outline:none;
+    max-height:min(34vh,360px);overflow:hidden;
+    -webkit-mask-image:linear-gradient(to bottom,#000 0,#000 78%,transparent 100%);
+    mask-image:linear-gradient(to bottom,#000 0,#000 78%,transparent 100%);
   }
-  #example-stream:focus-visible{outline:2px solid var(--hairline);outline-offset:6px;border-radius:10px;}
-  #example-stream .example-list{display:flex;flex-direction:column;align-items:stretch;will-change:transform;}
   .example-chip{
-    width:100%;border:0;background:transparent;color:var(--muted);cursor:pointer;padding:4px 2px;
-    font:400 14px/1.35 'Atkinson Hyperlegible',ui-sans-serif,sans-serif;
+    width:100%;border:0;background:transparent;color:var(--muted);cursor:pointer;padding:5px 2px;
+    font:400 clamp(12px,1.6vw,14px)/1.25 'Atkinson Hyperlegible',ui-sans-serif,sans-serif;
     text-align:left;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
-    height:var(--example-row);display:flex;align-items:center;
     opacity:0;transform:translateY(6px);animation:example-in .75s ease forwards;
   }
   .example-chip:hover,.example-chip:focus-visible{color:var(--ink);outline:none;}
@@ -205,8 +200,8 @@
   .ambig-node{cursor:pointer;}
   .ambiguity-hit{fill:transparent;stroke:none;pointer-events:all;}
   .ambig-node .word,.ambig-node .tag{transition:opacity .16s ease,text-shadow .16s ease;}
-  body.has-tree .ambig-node .word{animation:ambiguity-flash 3.8s ease-in-out var(--pulse-delay,.9s) 2;}
-  body.has-tree .ambig-node .tag{animation:ambiguity-tag-flash 3.8s ease-in-out var(--pulse-delay,.9s) 2;}
+  body.has-tree .ambig-node .word{animation:ambiguity-flash 3.8s ease-in-out .9s 2;}
+  body.has-tree .ambig-node .tag{animation:ambiguity-tag-flash 3.8s ease-in-out .9s 2;}
   .ambig-node:hover .word,.ambig-node:focus-visible .word{text-shadow:0 0 7px currentColor;}
   .ambig-node:hover .tag,.ambig-node:focus-visible .tag{opacity:1;}
   #toast{
@@ -217,17 +212,6 @@
     backdrop-filter:blur(8px);
   }
   #toast.show{opacity:1;transform:translate(-50%,0);}
-  #notice{
-    position:fixed;left:50%;bottom:max(70px,calc(env(safe-area-inset-bottom) + 56px));z-index:16;
-    transform:translate(-50%,12px);opacity:0;visibility:hidden;pointer-events:none;
-    max-width:min(440px,calc(100vw - 32px));text-align:center;
-    color:var(--ink);background:var(--panel);border:1px solid var(--hairline);border-radius:14px;
-    padding:12px 20px;box-shadow:0 6px 26px rgba(0,0,0,.16);
-    font:400 clamp(14px,2.4vw,17px)/1.4 'Atkinson Hyperlegible',ui-sans-serif,system-ui,sans-serif;
-    backdrop-filter:blur(10px);
-    transition:opacity .34s ease,transform .34s ease,visibility .34s ease;
-  }
-  #notice.show{opacity:1;transform:translate(-50%,0);visibility:visible;}
   .draw-item{opacity:0;transform:translateY(-18px);animation:diagram-down .42s cubic-bezier(.2,.8,.2,1) forwards;}
   .branch path,.branch line{stroke-dasharray:1;stroke-dashoffset:1;}
   .branch.draw-item path,.branch.draw-item line{animation:diagram-line .46s ease forwards;animation-delay:inherit;}
@@ -255,8 +239,8 @@
     #sentenceText{font-size:14px;text-align:left;}
     #sentenceExpand{width:26px;height:26px;}
     #surprise{margin-top:12px;font-size:13px;}
-    #example-stream{--example-count:7;margin-top:12px;}
-    .example-chip{font-size:13px;line-height:1.32;padding:4px 2px;color:var(--muted);}
+    #example-stream{max-height:min(36vh,320px);margin-top:14px;}
+    .example-chip{font-size:16px;line-height:1.28;padding:7px 2px;color:rgba(21,21,21,.66);}
   }
   @media (max-width:240px){
     .icon-btn{width:22px;height:22px;}
@@ -268,7 +252,7 @@
     #sentenceExpand{width:22px;height:22px;}
   }
   @media (prefers-reduced-motion:reduce){
-    #prompt,#controls,.sentence,#sentenceOverlay,#exportOverlay,#infoOverlay,#notice,.draw-item,.branch.draw-item path,.branch.draw-item line,.example-chip,.ambig-node .word,.ambig-node .tag{animation:none;transition:none;}
+    #prompt,#controls,.sentence,#sentenceOverlay,#exportOverlay,#infoOverlay,.draw-item,.branch.draw-item path,.branch.draw-item line,.example-chip,.ambig-node .word,.ambig-node .tag{animation:none;transition:none;}
     .draw-item,.sentence{opacity:1;transform:none;}
     .example-chip{opacity:.68;transform:none;}
     body.has-tree #prompt{opacity:0;visibility:hidden;}
@@ -288,8 +272,7 @@
       </button>
     </form>
     <button id="surprise" type="button">Surprise me</button>
-    <div id="exampleHelp" class="sr-only">Scroll to browse more example sentences. Use Up and Down arrows when focused.</div>
-    <div id="example-stream" aria-label="Example sentences" tabindex="0" aria-describedby="exampleHelp"></div>
+    <div id="example-stream" aria-label="Example sentences"></div>
   </div>
 </div>
 <div id="controls" aria-label="Diagram controls">
@@ -341,18 +324,16 @@
     <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12"/><path d="M18 6 6 18"/></svg>
   </button>
   <div id="infoPanel">
-    <p>Type a sentence and it draws a tree that shows how the words group together — which words are the subject, which are the action, and so on.</p>
-    <p>It all happens right here in your browser, with no AI. A small dictionary tool called <a href="https://github.com/spencermountain/compromise" rel="noopener">compromise</a> labels the words, and a few simple rules build the tree.</p>
-    <p>Glowing words can be more than one part of speech — tap one to switch it. It's a friendly toy, not a linguist.</p>
+    <p>This is a tiny phrase-structure sketcher. It tokenizes your sentence with <a href="https://github.com/spencermountain/compromise" rel="noopener">compromise</a>, folds the tags into a simplified constituency grammar, then draws the tree as rough SVG in your browser.</p>
+    <p>Ambiguous words can be tapped when the parser has a constrained alternate tag. It is not a linguist. It is a legible toy model.</p>
     <p><a href="https://lukesteuber.com/" rel="noopener">lukesteuber.com</a> / <a href="https://datapoems.io/" rel="noopener">datapoems.io</a> / <a href="https://diachronica.com/" rel="noopener">diachronica.com</a></p>
   </div>
 </div>
 <div id="toast" aria-hidden="true"></div>
-<div id="notice" role="status" aria-live="polite"></div>
 <div class="sr-only" id="sr" aria-live="polite"></div>
 
-<script src="vendor/rough.js"></script>
-<script src="vendor/compromise.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/roughjs@4.6.6/bundled/rough.js"></script>
+<script src="https://unpkg.com/compromise@14/builds/compromise.js"></script>
 <script>
 /* tree-engine.js: shared tidy-tree layout + draw core for the clock gallery.
  *
@@ -701,12 +682,11 @@
     var ink=styles.getPropertyValue('--line').trim()||'#202020';
     var strokeWidth=parseFloat(styles.getPropertyValue('--stroke-width'))||1.25;
     var roughness=parseFloat(styles.getPropertyValue('--roughness'))||1.15;
-    var bowing=parseFloat(styles.getPropertyValue('--bowing'))||1;
     if(window.rough){
       var rc=window.rough.svg(svg);
       lay.links.forEach(function(lk){
         var g=(lk.b.children&&lk.b.children.length)?20:34;
-        svg.appendChild(animateItem(rc.line(lk.a.x,lk.a.y+20,lk.b.x,lk.b.y-g,{stroke:ink,strokeWidth:strokeWidth,roughness:roughness,bowing:bowing}),lk.b._depth,'branch'));
+        svg.appendChild(animateItem(rc.line(lk.a.x,lk.a.y+20,lk.b.x,lk.b.y-g,{stroke:ink,strokeWidth:strokeWidth,roughness:roughness,bowing:1}),lk.b._depth,'branch'));
       });
     }else{
       lay.links.forEach(function(lk){
@@ -714,7 +694,6 @@
         svg.appendChild(animateItem(el('line',{x1:lk.a.x,y1:lk.a.y+20,x2:lk.b.x,y2:lk.b.y-g,stroke:ink,'stroke-width':strokeWidth}),lk.b._depth,'branch'));
       });
     }
-    var ambigSeen=0;
     lay.nodes.forEach(function(n){
       var g=el('g',{});
       if(n.children&&n.children.length){
@@ -728,9 +707,6 @@
           g.setAttribute('role','button');
           g.setAttribute('aria-label','Change part of speech for '+n.word);
           g.appendChild(el('title',{},'Change part of speech: '+n.candidates.join(' / ')));
-          // Stagger the pulse so multiple changeable words never fire in unison:
-          // chain down the tree (upper nodes first) with a small ordinal tiebreaker.
-          g.style.setProperty('--pulse-delay',(0.9+(n._depth||0)*0.14+(ambigSeen++)*0.06).toFixed(2)+'s');
         }
         g.appendChild(el('text',{x:n.x,y:n.y-15,'text-anchor':'middle',class:'tag',fill:'var(--muted)','font-size':'15px'},n.tag));
         g.appendChild(el('text',{x:n.x,y:n.y+22,'text-anchor':'middle',class:'word',fill:'var(--ink)','font-size':'22px'},n.word));
@@ -872,23 +848,22 @@
     sentenceFull.textContent=display;
     window.requestAnimationFrame(updateSentenceOverflow);
     sr.textContent='Parsed: '+text;
-    var changeable=0;
-    for(var ci=0;ci<toks.length;ci++){if(toks[ci].candidates&&toks[ci].candidates.length>1)changeable++;}
-    maybeFirstTimeHint(changeable);
   }
 
   var THEMES=[
+    {name:'midnight',fx:'fx-midnight',v:{'--bg':'#080d23','--ink':'#dcdce8','--muted':'#a4abd0','--line':'#70bde6','--hairline':'#33405f','--panel':'#0b1026','--control-bg':'#10172fee','--stroke-width':'1.4','--roughness':'0.3'}},
     {name:'chalk',fx:'fx-chalk',v:{'--bg':'#36443c','--ink':'#eaf0e7','--muted':'rgba(234,240,231,.72)','--line':'#eaf0e7','--hairline':'rgba(234,240,231,.24)','--panel':'rgba(54,68,60,.94)','--control-bg':'rgba(54,68,60,.72)','--stroke-width':'1.35','--roughness':'1.3'}},
     {name:'marker',fx:'fx-marker',v:{'--bg':'#f4f6f8','--ink':'#15623e','--muted':'rgba(26,92,60,.72)','--line':'#1f8a5b','--hairline':'rgba(31,138,91,.28)','--panel':'rgba(244,246,248,.94)','--control-bg':'rgba(244,246,248,.74)','--stroke-width':'1.45','--roughness':'1.05'}},
     {name:'board',fx:'fx-board',v:{'--bg':'#ffffff','--ink':'#0f3f80','--muted':'rgba(15,63,128,.62)','--line':'#155bb0','--hairline':'rgba(20,90,170,.26)','--panel':'rgba(255,255,255,.94)','--control-bg':'rgba(255,255,255,.74)','--stroke-width':'1.25','--roughness':'1.0'}},
-    {name:'paper',fx:'fx-paper',v:{'--bg':'#fbfaf6','--ink':'#4a4f57','--muted':'rgba(74,79,87,.6)','--line':'#6b7078','--hairline':'rgba(74,79,87,.22)','--panel':'rgba(251,250,246,.94)','--control-bg':'rgba(251,250,246,.76)','--stroke-width':'1.05','--roughness':'1.65'}},
-    {name:'sharpie',fx:'fx-sharpie',v:{'--bg':'#ffffff','--ink':'#000000','--muted':'rgba(0,0,0,.72)','--line':'#000000','--hairline':'rgba(0,0,0,.26)','--panel':'rgba(255,255,255,.97)','--control-bg':'rgba(255,255,255,.82)','--stroke-width':'3.1','--roughness':'1.9','--bowing':'1.9'}}
+    {name:'paper',fx:'fx-paper',v:{'--bg':'#ffffff','--ink':'#050505','--muted':'rgba(5,5,5,.58)','--line':'#050505','--hairline':'rgba(5,5,5,.18)','--panel':'rgba(255,255,255,.94)','--control-bg':'rgba(255,255,255,.76)','--stroke-width':'2.25','--roughness':'1.18'}},
+    {name:'sharpie',fx:'fx-sharpie',v:{'--bg':'#fdfdf9','--ink':'#070707','--muted':'rgba(7,7,7,.6)','--line':'#050505','--hairline':'rgba(7,7,7,.2)','--panel':'rgba(253,253,249,.94)','--control-bg':'rgba(253,253,249,.78)','--stroke-width':'2.35','--roughness':'1.22'}}
   ];
   function themeIndexByName(name){
     for(var i=0;i<THEMES.length;i++)if(THEMES[i].name===name)return i;
     return -1;
   }
   var params;try{params=new URLSearchParams(location.search);}catch(e){params=null;}
+  if(params&&params.get('bare')==='1')document.body.classList.add('bare');
   var initialQuery=params?(params.get('q')||''):'';
   var sharedTheme=params?(params.get('theme')||''):'';
   var currentText='', currentTokens=[], posOverrides=parsePosOverrides(params?(params.get('pos')||''):'');
@@ -911,7 +886,6 @@
   }
   function applyTheme(redraw){
     var t=THEMES[((themeIndex%THEMES.length)+THEMES.length)%THEMES.length],rs=document.documentElement.style;
-    rs.removeProperty('--bowing'); // only some themes (sharpie) override this; fall back to :root default otherwise
     for(var k in t.v)rs.setProperty(k,t.v[k]);
     THEMES.forEach(function(x){if(x.fx)document.body.classList.remove(x.fx);});
     if(t.fx)document.body.classList.add(t.fx);
@@ -926,11 +900,8 @@
   function currentThemeName(){
     return THEMES[((themeIndex%THEMES.length)+THEMES.length)%THEMES.length].name;
   }
-  function appBaseUrl(){
-    return new URL(location.pathname||'/',location.origin);
-  }
   function appSentenceUrl(text){
-    var u=appBaseUrl();
+    var u=new URL('/syntax/',location.origin);
     u.searchParams.set('q',text);
     u.searchParams.set('theme',currentThemeName());
     var pos=encodedPosOverrides();
@@ -938,9 +909,9 @@
     return u.toString();
   }
   function sentenceUrl(text){
-    var u=appBaseUrl();
+    if(currentThemeName()==='midnight')return appSentenceUrl(text);
+    var u=new URL('/syntax/share/'+currentThemeName()+'/',location.origin);
     u.searchParams.set('q',text);
-    u.searchParams.set('theme',currentThemeName());
     var pos=encodedPosOverrides();
     if(pos)u.searchParams.set('pos',pos);
     return u.toString();
@@ -1011,10 +982,10 @@
   }
 
   function activeFontFamily(){
-    if(document.body.classList.contains('fx-chalk')||
-       document.body.classList.contains('fx-paper'))return "'Gloria Hallelujah', cursive";
+    if(document.body.classList.contains('fx-chalk'))return "'Gloria Hallelujah', cursive";
     if(document.body.classList.contains('fx-marker')||
        document.body.classList.contains('fx-board')||
+       document.body.classList.contains('fx-paper')||
        document.body.classList.contains('fx-sharpie'))return "'Permanent Marker', cursive";
     return "'Atkinson Hyperlegible', ui-sans-serif, system-ui, sans-serif";
   }
@@ -1185,27 +1156,6 @@
     clearTimeout(toastTimer);
     toastTimer=setTimeout(function(){t.classList.remove('show');},1300);
   }
-  var noticeTimer=null;
-  function showNotice(text,duration){
-    var n=document.getElementById('notice');
-    if(!n)return;
-    n.textContent=text;
-    n.classList.add('show');
-    clearTimeout(noticeTimer);
-    noticeTimer=setTimeout(function(){n.classList.remove('show');},duration||3600);
-  }
-  var POS_LABEL={N:'noun',V:'verb',Adj:'adjective',Adv:'adverb',P:'preposition',
-    Aux:'auxiliary',Det:'determiner',Num:'number',Pron:'pronoun',Conj:'conjunction'};
-  function posLabel(p){return POS_LABEL[p]||p;}
-  var FIRST_HINT_KEY='syntaxtree.posHint.v1';
-  function maybeFirstTimeHint(count){
-    if(!count)return;
-    var seen=false;
-    try{seen=localStorage.getItem(FIRST_HINT_KEY)==='1';}catch(e){}
-    if(seen)return;
-    try{localStorage.setItem(FIRST_HINT_KEY,'1');}catch(e){}
-    showNotice('Glowing words have more than one part of speech — tap one to change it.',5200);
-  }
   function cycleAmbiguity(idx){
     var tok=currentTokens[idx];
     if(!tok||!tok.candidates||tok.candidates.length<2)return;
@@ -1214,8 +1164,8 @@
     if(next===tok.basePos)delete posOverrides[idx];else posOverrides[idx]=next;
     run(currentText);
     updateShareUrl(currentText);
-    sr.textContent='Set '+tok.w+' to '+posLabel(next)+'.';
-    showNotice(posLabel(current)+' → '+posLabel(next),2600);
+    sr.textContent='Set '+tok.w+' to '+next+'.';
+    showToast(tok.w+' → '+next);
   }
   function ambiguityTarget(node){
     while(node&&node!==svg){
@@ -1305,116 +1255,24 @@
     'I saw her duck.',
     'Buffalo buffalo Buffalo buffalo buffalo buffalo Buffalo buffalo.'
   ];
-  function setupExampleScroller(){
+  function shuffle(a){
+    a=a.slice();
+    for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1)),t=a[i];a[i]=a[j];a[j]=t;}
+    return a;
+  }
+  function populateExamples(){
     var wrap=document.getElementById('example-stream');
     if(!wrap)return;
-    var compact=false;
-    try{compact=window.matchMedia&&window.matchMedia('(max-width:520px)').matches;}catch(e){}
-    var visibleCount=compact?7:10;
-    var list=document.createElement('div');
-    list.className='example-list';
-    wrap.innerHTML='';
-    wrap.appendChild(list);
-
-    var len=EXAMPLE_BANK.length;
-    var order=[];
-    var animating=false;
-    var row=28;
-    try{
-      var cssRow=parseFloat(getComputedStyle(wrap).getPropertyValue('--example-row'));
-      if(cssRow)row=cssRow;
-    }catch(e){}
-
-    function idx(n){ return ((n%len)+len)%len; }
-    function sentenceAt(i){ return EXAMPLE_BANK[idx(i)]; }
-    function makeChip(sentence, i, instant){
+    shuffle(EXAMPLE_BANK).forEach(function(s,i){
       var b=document.createElement('button');
       b.type='button';
       b.className='example-chip';
-      b.textContent=sentence;
-      b.style.animationDelay=instant?'0s':(0.08+i*0.07)+'s';
-      b.style.animationDuration=instant?'.2s':'';
-      b.style.setProperty('--queue-opacity',Math.max(.5,.68-i*.025));
-      b.addEventListener('click',function(){q.value=sentence;submitSentence(sentence);});
-      return b;
-    }
-    function fill(){
-      order=[];
-      list.innerHTML='';
-      var start=Math.floor(Math.random()*len);
-      for(var i=0;i<visibleCount;i++){
-        order.push(idx(start+i));
-        list.appendChild(makeChip(sentenceAt(order[i]), i));
-      }
-    }
-    function settle(){
-      list.style.transition='none';
-      list.style.transform='translateY(0px)';
-      // Allow the browser a tick to apply the no-transition state before unlocking.
-      requestAnimationFrame(function(){ animating=false; });
-    }
-    function shiftForward(){
-      if(animating||order.length<2)return;
-      animating=true;
-      list.style.transition='transform 160ms ease';
-      list.style.transform='translateY('+(-row)+'px)';
-      list.addEventListener('transitionend', function done(){
-        list.removeEventListener('transitionend', done);
-        // Drop the top item and append the next item at the bottom.
-        order.shift();
-        if(list.firstChild)list.removeChild(list.firstChild);
-        var next=idx(order[order.length-1]+1);
-        order.push(next);
-        list.appendChild(makeChip(sentenceAt(next), order.length-1, true));
-        sr.textContent='Example: '+sentenceAt(order[0]);
-        settle();
-      });
-    }
-    function shiftBackward(){
-      if(animating||order.length<2)return;
-      animating=true;
-      // Prepend the previous item, then animate it into place.
-      var prev=idx(order[0]-1);
-      order.unshift(prev);
-      list.insertBefore(makeChip(sentenceAt(prev), 0, true), list.firstChild);
-      list.style.transition='none';
-      list.style.transform='translateY('+(-row)+'px)';
-      requestAnimationFrame(function(){
-        list.style.transition='transform 160ms ease';
-        list.style.transform='translateY(0px)';
-        list.addEventListener('transitionend', function done(){
-          list.removeEventListener('transitionend', done);
-          // Drop the bottom item to keep a constant window.
-          order.pop();
-          if(list.lastChild)list.removeChild(list.lastChild);
-          sr.textContent='Example: '+sentenceAt(order[0]);
-          settle();
-        });
-      });
-    }
-
-    // Wheel/trackpad browsing (scroll down → list moves up, disappearing near the input).
-    var wheelAccumulator=0, wheelTimer=null;
-    wrap.addEventListener('wheel', function(e){
-      if(document.body.classList.contains('input-has-text'))return;
-      e.preventDefault();
-      wheelAccumulator+=e.deltaY;
-      clearTimeout(wheelTimer);
-      wheelTimer=setTimeout(function(){wheelAccumulator=0;},180);
-      if(Math.abs(wheelAccumulator)<18)return;
-      var dy=wheelAccumulator;
-      wheelAccumulator=0;
-      if(dy>0)shiftForward(); else shiftBackward();
-    }, {passive:false});
-
-    // Keyboard fallback when the region is focused.
-    wrap.addEventListener('keydown', function(e){
-      if(e.key==='ArrowDown'){ e.preventDefault(); shiftForward(); }
-      else if(e.key==='ArrowUp'){ e.preventDefault(); shiftBackward(); }
+      b.textContent=s;
+      b.style.animationDelay=(0.08+i*0.07)+'s';
+      b.style.setProperty('--queue-opacity',Math.max(.24,.62-i*.018));
+      b.addEventListener('click',function(){q.value=s;submitSentence(s);});
+      wrap.appendChild(b);
     });
-
-    fill();
-    sr.textContent='Example: '+sentenceAt(order[0]);
   }
   function surpriseSentence(){
     var s=SURPRISES[Math.floor(Math.random()*SURPRISES.length)];
@@ -1463,7 +1321,7 @@
   function boot(){
     if(!window.TreeEngine){setTimeout(boot,60);return;}
     applyTheme(false);
-    setupExampleScroller();
+    populateExamples();
     if(initialQuery){
       submitSentence(initialQuery,true);
       updateShareMeta(initialQuery,location.href);
@@ -1474,5 +1332,6 @@
   boot();
 })();
 </script>
+<script>if(window.self===window.top){var s=document.createElement('script');s.async=true;s.setAttribute('data-goatcounter','https://stats.dr.eamer.dev/count');s.src='https://stats.dr.eamer.dev/count.js';document.body.appendChild(s);}</script>
 </body>
 </html>

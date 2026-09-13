@@ -1,5 +1,4 @@
 .DS_Store
 .playwright-mcp/
 node_modules/
-recovered/dr-eamer-dev/crawls/
 tools/

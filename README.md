@@ -76,4 +76,5 @@ here is the file that is live.
 
 ## License
 
-MIT. See [LICENSE](LICENSE).
+The application is MIT licensed. See [LICENSE](LICENSE). Bundled dependencies
+retain their own [MIT copyright notices and version records](vendor/README.md).

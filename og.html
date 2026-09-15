@@ -1,0 +1,135 @@
+<!doctype html>
+<!-- Open Graph card generator for /syntax/. Renders the same tree full-bleed in
+     the app's share-card faces, no text.
+     Render in a tall window and crop the top 1200x630 (headless Chrome under-paints
+     a 1200x630 window): google-chrome --headless=new --window-size=1200,860
+     --screenshot=full.png og.html ; then crop (0,0,1200,630) -> social-card.png. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="referrer" content="no-referrer">
+<title>Syntax Tree OG card — three faces, no text</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Gloria+Hallelujah&family=Permanent+Marker&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html,body{width:1200px;height:630px;overflow:hidden;background:#fff;}
+  #card{display:flex;width:1200px;height:630px;}
+  .panel{position:relative;width:300px;height:630px;overflow:hidden;}
+  .panel.chalk{background:#36443c;}
+  .panel.marker{background:#f4f6f8;background-image:repeating-linear-gradient(0deg,transparent 0 31px,rgba(110,110,110,.10) 31px 32px);}
+  .panel.board{background:#ffffff;}
+  .panel.paper{background:#ffffff;background-image:repeating-linear-gradient(0deg,transparent 0 29px,rgba(0,0,0,.026) 29px 30px),repeating-linear-gradient(90deg,rgba(0,0,0,.010) 0 1px,transparent 1px 9px);}
+  .panel.sharpie{background:#fdfdf9;background-image:repeating-linear-gradient(0deg,transparent 0 29px,rgba(30,30,30,.045) 29px 30px),repeating-linear-gradient(90deg,rgba(0,0,0,.012) 0 1px,transparent 1px 9px);}
+  .panel.chalk{border-right:1px solid rgba(255,255,255,.10);}
+  .panel.marker,.panel.board{border-right:1px solid rgba(0,0,0,.08);}
+  .panel svg{position:absolute;inset:0;width:300px;height:630px;display:block;}
+  .panel.chalk text{font-family:'Gloria Hallelujah',cursive;}
+  .panel.marker text,.panel.board text,.panel.paper text,.panel.sharpie text{font-family:'Permanent Marker',cursive;}
+  body.single #card{display:block;}
+  body.single .panel{display:none;width:1200px;height:630px;border-right:0;}
+  body.single .panel.active{display:block;}
+  body.single .panel svg{width:1200px;height:630px;}
+</style>
+</head>
+<body>
+<div id="card">
+  <div class="panel chalk"><svg preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg"></svg></div>
+  <div class="panel marker"><svg preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg"></svg></div>
+  <div class="panel board"><svg preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg"></svg></div>
+  <div class="panel paper"><svg preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg"></svg></div>
+  <div class="panel sharpie"><svg preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg"></svg></div>
+</div>
+<script src="vendor/rough.js"></script>
+<script src="vendor/compromise.js"></script>
+<script>
+/* tree-engine (copied verbatim from the app) */
+(function (global) {
+  "use strict";
+  var LEVEL_GAP = 120;
+  function halfWidth(node){if(node.children&&node.children.length)return 40;var w=(node.word||"").length;return Math.max(46,w*4.6);}
+  var HALF_HEIGHT = 20;
+  function measure(root){var leaves=0,depth=0;(function walk(n,d){if(d>depth)depth=d;if(n.children&&n.children.length){n.children.forEach(function(c){walk(c,d+1);});}else{leaves++;}})(root,0);return{leaves:leaves,depth:depth};}
+  function layout(root,opts){opts=opts||{};var levelGap=opts.levelGap||LEVEL_GAP;var pad=opts.padding==null?28:opts.padding;var info=measure(root);var span=Math.max(1,info.leaves-1);var leafGap=opts.leafGap;if(leafGap==null){var aspect=opts.aspect||1.6;var targetW=aspect*info.depth*levelGap;leafGap=targetW/span;var maxHW=46;(function wide(n){if(n.children&&n.children.length)n.children.forEach(wide);else{var h=halfWidth(n);if(h>maxHW)maxHW=h;}})(root);leafGap=Math.max(maxHW*2+16,Math.min(360,leafGap));}var nextLeaf=0;(function place(n,d){n._depth=d;n.y=d*levelGap;if(n.children&&n.children.length){n.children.forEach(function(c){place(c,d+1);});var kids=n.children;n.x=(kids[0].x+kids[kids.length-1].x)/2;}else{n.x=nextLeaf*leafGap;nextLeaf++;}})(root,0);var nodes=[],links=[];var minX=Infinity,maxX=-Infinity,minY=Infinity,maxY=-Infinity;(function collect(n){nodes.push(n);var hw=halfWidth(n);if(n.x-hw<minX)minX=n.x-hw;if(n.x+hw>maxX)maxX=n.x+hw;if(n.y-HALF_HEIGHT<minY)minY=n.y-HALF_HEIGHT;if(n.y+HALF_HEIGHT>maxY)maxY=n.y+HALF_HEIGHT;if(n.children){n.children.forEach(function(c){links.push({a:n,b:c});collect(c);});}})(root);minX-=pad;maxX+=pad;minY-=pad;maxY+=pad;var width=maxX-minX,height=maxY-minY;return{nodes:nodes,links:links,width:width,height:height,viewBox:minX+" "+minY+" "+width+" "+height};}
+  global.TreeEngine={LEVEL_GAP:LEVEL_GAP,measure:measure,layout:layout};
+})(window);
+</script>
+<script>
+(function(){
+  'use strict';
+  var NS='http://www.w3.org/2000/svg';
+  function posOf(tags){function has(x){return tags.indexOf(x)>=0;}
+    if(has('Pronoun'))return 'Pron';if(has('Determiner')||has('Article'))return 'Det';
+    if(has('Preposition'))return 'P';if(has('Conjunction'))return 'Conj';
+    if(has('Value')||has('Cardinal')||has('NumericValue')||has('Ordinal'))return 'Num';
+    if(has('Modal'))return 'Aux';if(has('Auxiliary')||has('Copula'))return has('Copula')?'V':'Aux';
+    if(has('Verb')||has('Gerund')||has('PastTense')||has('PresentTense')||has('Infinitive'))return 'V';
+    if(has('Adverb'))return 'Adv';if(has('Adjective')||has('Comparative')||has('Superlative'))return 'Adj';
+    if(has('ProperNoun')||has('Noun')||has('Plural')||has('Possessive'))return 'N';return 'N';}
+  var COMP={that:1,which:1,who:1,whom:1,whose:1,because:1,when:1,while:1,if:1,since:1,although:1,though:1,after:1,before:1,as:1,whether:1,unless:1,until:1,where:1,than:1};
+  function isComp(w){return COMP[w.toLowerCase()]===1;}
+  var PREP={over:1,under:1,above:1,below:1,beneath:1,beside:1,between:1,among:1,through:1,across:1,around:1,behind:1,into:1,onto:1,upon:1,within:1,toward:1,towards:1,against:1,during:1,despite:1,without:1,inside:1,outside:1,near:1,'in':1,on:1,at:1,by:1,'with':1,'from':1,of:1,'for':1,to:1,about:1,off:1};
+  function hasVerb(toks){for(var i=0;i<toks.length;i++)if(toks[i].pos==='V'||toks[i].pos==='Aux')return true;return false;}
+  function tokenize(text){var toks=[];try{var data=window.nlp(text).json({terms:{tags:true}});data.forEach(function(s){(s.terms||[]).forEach(function(t){var w=(t.text||'').replace(/^[^\w'-]+|[^\w'-]+$/g,'');if(!w)return;var tags=Array.isArray(t.tags)?t.tags:(t.tags?Object.keys(t.tags):[]);var p=posOf(tags);if(PREP[w.toLowerCase()])p='P';toks.push({w:w,pos:p});});});}catch(e){text.split(/\s+/).forEach(function(w){w=w.replace(/[^\w'-]/g,'');if(w)toks.push({w:w,pos:'N'});});}return toks;}
+  function leaf(t){var tag=t.pos==='Det'?'Det':t.pos==='Adj'?'Adj':t.pos==='Num'?'Num':t.pos==='Pron'?'Pron':t.pos==='Adv'?'Adv':t.pos==='P'?'P':t.pos==='Aux'?'Aux':t.pos==='V'?'V':t.pos==='Conj'?'Conj':'N';return{tag:tag,word:t.w};}
+  function buildNP(toks){if(!toks.length)return null;if(toks.length===1)return{tag:'NP',children:[leaf(toks[0])]};var pi=-1;for(var i=1;i<toks.length;i++){if(toks[i].pos==='P'){pi=i;break;}}var head=pi>=0?toks.slice(0,pi):toks;var np={tag:'NP',children:head.map(leaf)};if(pi>=0){var pp=buildPP(toks.slice(pi));if(pp)np.children.push(pp);}return np;}
+  function buildPP(toks){var kids=[{tag:'P',word:toks[0].w}];var np=buildNP(toks.slice(1));if(np)kids.push(np);return{tag:'PP',children:kids};}
+  function complements(toks){var out=[],i=0;function bound(k){var t=toks[k];return t.pos==='V'||t.pos==='Aux'||t.pos==='P'||t.pos==='Conj'||isComp(t.w);}while(i<toks.length){var t=toks[i],rest=toks.slice(i+1);if(isComp(t.w)||t.pos==='Conj'){if(hasVerb(rest)){out.push({tag:'SBAR',children:[{tag:'C',word:t.w},parseClause(rest)]});break;}var j=i+1;while(j<toks.length&&!bound(j))j++;out.push(buildPP(toks.slice(i,j)));i=j;}else if(t.pos==='P'){var j2=i+1;while(j2<toks.length&&!bound(j2))j2++;out.push(buildPP(toks.slice(i,j2)));i=j2;}else if(t.pos==='Adv'){out.push({tag:'Adv',word:t.w});i++;}else{var k=i+1;while(k<toks.length&&!bound(k))k++;out.push(buildNP(toks.slice(i,k)));i=k;}}return out;}
+  function parseClause(toks){if(!toks.length)return{tag:'S',children:[{tag:'X',word:'…'}]};var vi=-1;for(var i=0;i<toks.length;i++){if(toks[i].pos==='V'||toks[i].pos==='Aux'){vi=i;break;}}if(vi<0)return{tag:'S',children:[buildNP(toks)||{tag:'NP',children:toks.map(leaf)}]};var subj=toks.slice(0,vi);var subjNP=subj.length?buildNP(subj):{tag:'NP',children:[{tag:'Pron',word:'∅'}]};var k=vi,verbs=[];while(k<toks.length&&(toks[k].pos==='V'||toks[k].pos==='Aux'||(toks[k].pos==='Adv'&&verbs.length===0))){verbs.push(leaf(toks[k]));k++;}var vp={tag:'VP',children:verbs.length?verbs.slice():[{tag:'V',word:'∅'}]};complements(toks.slice(k)).forEach(function(c){vp.children.push(c);});return{tag:'S',children:[subjNP,vp]};}
+  function el(name,attrs,text){var n=document.createElementNS(NS,name);for(var k in attrs)n.setAttribute(k,attrs[k]);if(text!=null)n.textContent=text;return n;}
+
+  // the three faces, palettes lifted from the app's THEMES
+  var FACES=[
+    {ink:'#eaf0e7',tag:'#eff4ed',word:'#dde8da'}, // chalk / blackboard
+    {ink:'#1f8a5b',tag:'#1c7a50',word:'#15623e'}, // marker on paper
+    {ink:'#155bb0',tag:'#2f6dbb',word:'#0f3f80'}, // whiteboard
+    {ink:'#050505',tag:'#202020',word:'#050505'}, // black sharpie on bright paper
+    {ink:'#050505',tag:'#202020',word:'#070707'}  // sharpie whiteboard
+  ];
+  function drawInto(svg,treeRoot,face){
+    while(svg.firstChild)svg.removeChild(svg.firstChild);
+    var panel=svg.parentNode, aspect=(panel.clientWidth||1200)/(panel.clientHeight||630);
+    var lay=window.TreeEngine.layout(treeRoot,{aspect:aspect});
+    svg.setAttribute('viewBox',lay.viewBox);
+    var rc=window.rough.svg(svg);
+    lay.links.forEach(function(lk){var g=(lk.b.children&&lk.b.children.length)?20:34;svg.appendChild(rc.line(lk.a.x,lk.a.y+20,lk.b.x,lk.b.y-g,{stroke:face.ink,strokeWidth:1.6,roughness:1.5,bowing:1.4}));});
+    lay.nodes.forEach(function(n){
+      if(n.children&&n.children.length){
+        svg.appendChild(el('text',{x:n.x,y:n.y+6,'text-anchor':'middle',fill:face.tag,'font-style':'italic','font-size':'17px'},n.tag));
+      }else{
+        svg.appendChild(el('text',{x:n.x,y:n.y-15,'text-anchor':'middle',fill:face.tag,'font-style':'italic','font-size':'16px'},n.tag));
+        svg.appendChild(el('text',{x:n.x,y:n.y+22,'text-anchor':'middle',fill:face.word,'font-size':'22px'},n.word));
+      }
+    });
+  }
+  function renderAll(text){
+    var toks=tokenize(text);
+    var tree=toks.length?parseClause(toks):{tag:'S',children:[{tag:'X',word:text}]};
+    var svgs=document.querySelectorAll('.panel svg');
+    var themes=['chalk','marker','board','paper','sharpie'], one=null;
+    try{one=new URLSearchParams(location.search).get('theme');}catch(e){}
+    if(one&&themes.indexOf(one)>=0){
+      document.body.classList.add('single');
+      var at=themes.indexOf(one), panels=document.querySelectorAll('.panel');
+      panels[at].classList.add('active');
+      drawInto(svgs[at],JSON.parse(JSON.stringify(tree)),FACES[at]);
+    }else{
+      for(var i=0;i<svgs.length;i++) drawInto(svgs[i],JSON.parse(JSON.stringify(tree)),FACES[i]);
+    }
+  }
+  function boot(){
+    if(!window.nlp||!window.TreeEngine||!window.rough){setTimeout(boot,60);return;}
+    var go=function(){renderAll(SENTENCE);window.__cardReady=true;};
+    if(document.fonts&&document.fonts.ready){
+      Promise.all([document.fonts.load('22px "Permanent Marker"'),document.fonts.load('22px "Gloria Hallelujah"')])
+        .then(function(){document.fonts.ready.then(function(){setTimeout(go,150);});}).catch(go);
+    }else go();
+  }
+  var SENTENCE='Grammar hides a tree.';
+  try{var qp=new URLSearchParams(location.search).get('q');if(qp)SENTENCE=qp;}catch(e){}
+  boot();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="referrer" content="no-referrer">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Syntax Tree: make your own sentence diagram</title>
+<meta name="description" content="Open a shared phrase-structure diagram, then make your own syntax tree.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Syntax Tree: blackboard diagram">
+<meta property="og:description" content="Open a shared phrase-structure diagram, then make your own syntax tree.">
+<meta property="og:url" content="https://datapoems.io/datavis/syntax/share/chalk/">
+<meta property="og:image" content="https://datapoems.io/syntax/social-card-chalk.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:type" content="image/png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Syntax Tree: blackboard diagram">
+<meta name="twitter:description" content="Open a shared phrase-structure diagram, then make your own syntax tree.">
+<meta name="twitter:image" content="https://datapoems.io/syntax/social-card-chalk.png">
+</head>
+<body>
+<a id="fallback" href="../../?theme=chalk">Open syntax tree</a>
+<script>
+(function(){
+  var p=new URLSearchParams(location.search);
+  p.set('theme','chalk');
+  var url=new URL('../../',location.href);
+  url.search=p.toString();
+  document.getElementById('fallback').href=url;
+  location.replace(url);
+})();
+</script>
+</body>
+</html>

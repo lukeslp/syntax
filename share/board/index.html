@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
+<meta name="referrer" content="no-referrer">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Syntax Tree: make your own sentence diagram</title>
 <meta name="description" content="Open a shared phrase-structure diagram, then make your own syntax tree.">
@@ -19,18 +20,16 @@
 <meta name="twitter:image" content="https://datapoems.io/syntax/social-card-board.png">
 </head>
 <body>
-<a id="fallback" href="/syntax/?theme=board">Open syntax tree</a>
+<a id="fallback" href="../../?theme=board">Open syntax tree</a>
 <script>
 (function(){
   var p=new URLSearchParams(location.search);
   p.set('theme','board');
-  var url='/syntax/?'+p.toString();
+  var url=new URL('../../',location.href);
+  url.search=p.toString();
   document.getElementById('fallback').href=url;
   location.replace(url);
 })();
 </script>
-<!-- GoatCounter Analytics -->
-<script data-goatcounter="https://stats.dr.eamer.dev/count"
-        async src="https://stats.dr.eamer.dev/count.js"></script>
 </body>
 </html>

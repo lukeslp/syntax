@@ -4,7 +4,9 @@ Type a sentence and watch its phrase-structure tree draw itself downward, in
 the hand of a whiteboard marker. Browser-only, one HTML file, no build step,
 no language model.
 
-**Live:** https://datapoems.io/datavis/syntax/
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue?style=flat-square)](LICENSE)
+
+[Try Syntax Tree](https://datapoems.io/datavis/syntax/) · [Luke Steuber](https://lukesteuber.com/)
 
 ![A phrase-structure tree of "The quick brown fox jumps over the lazy dog" on a whiteboard](social-card-board.png)
 
@@ -50,7 +52,14 @@ keep everything else.
 4. [rough.js](https://roughjs.com/) draws the branches and labels so the
    result looks drawn by hand, with a different roughness per style.
 
-Everything runs in the browser. No sentence leaves the page.
+Parsing and drawing run in the browser. There are no analytics scripts.
+Fonts load from Google Fonts; system fonts are used if that service is
+unavailable. Pages suppress the referrer header on outgoing requests.
+
+The address bar and shared links include the sentence. Opening or reloading
+such a link sends it to the server hosting that copy, and sharing a link or
+image shares the sentence with its recipient. Avoid putting private text in
+links you share.
 
 ## Run it locally
 
@@ -58,8 +67,12 @@ Everything runs in the browser. No sentence leaves the page.
 npm start
 ```
 
-That serves the directory on `http://localhost:5173/` with Python's built-in
-server. Any static server works; the app is `index.html` plus `vendor/`.
+This requires Node/npm and Python 3. It serves the directory on
+`http://localhost:5173/` with Python's built-in server. You can also run
+`python3 -m http.server 5173` directly, without Node. No dependency installation
+or build is needed. Any static server works; the app is `index.html` plus
+`vendor/`. Include `share/` and the preview images for shared links. Links work
+at the site root or under a subdirectory.
 
 ## Layout
 
@@ -71,8 +84,18 @@ server. Any static server works; the app is `index.html` plus `vendor/`.
 | `social-card-*.png` | Preview cards, one per style |
 | `og.html` | Renders the preview cards for a screenshot pass |
 
-The deployed site serves this repository's root directly, so the `index.html`
-here is the file that is live.
+To host your own copy, serve this directory as a static site. Update the
+canonical URL and social-preview metadata in the HTML files to your own public
+address. The hosted demo may use an earlier commit than this repository.
+
+## Contributing
+
+Bug reports are most useful with a short example sentence, the expected
+diagram, and your browser/version. Use an invented sentence rather than
+private classroom or personal material. Before proposing a change, check
+typing, example selection, all six styles, shared-link reloads, and PNG export
+at both phone and desktop widths. The grammar is intentionally simplified;
+explain the interpretation your parser change improves.
 
 ## License
 

@@ -7,6 +7,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
+<meta name="referrer" content="no-referrer">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Syntax Tree: diagram a sentence</title>
 <meta name="description" content="Enter a sentence and watch its phrase-structure tree diagram itself downward.">
@@ -39,6 +40,7 @@
     font-family:'Atkinson Hyperlegible',ui-sans-serif,system-ui,sans-serif;
     display:flex;flex-direction:column;
   }
+  main{display:flex;flex-direction:column;flex:1;min-height:0;}
   body.fx-chalk .tag,body.fx-chalk .word,body.fx-chalk .sentence{font-family:'Gloria Hallelujah',cursive;}
   body.fx-marker .tag,body.fx-marker .word,body.fx-marker .sentence,
   body.fx-board .tag,body.fx-board .word,body.fx-board .sentence,
@@ -903,8 +905,9 @@
   function currentThemeName(){
     return THEMES[((themeIndex%THEMES.length)+THEMES.length)%THEMES.length].name;
   }
+  var appRoot=new URL('./',location.href);
   function appSentenceUrl(text){
-    var u=new URL('/syntax/',location.origin);
+    var u=new URL(appRoot);
     u.searchParams.set('q',text);
     u.searchParams.set('theme',currentThemeName());
     var pos=encodedPosOverrides();
@@ -913,7 +916,7 @@
   }
   function sentenceUrl(text){
     if(currentThemeName()==='midnight')return appSentenceUrl(text);
-    var u=new URL('/syntax/share/'+currentThemeName()+'/',location.origin);
+    var u=new URL('share/'+currentThemeName()+'/',appRoot);
     u.searchParams.set('q',text);
     var pos=encodedPosOverrides();
     if(pos)u.searchParams.set('pos',pos);
@@ -1335,6 +1338,5 @@
   boot();
 })();
 </script>
-<script>if(window.self===window.top){var s=document.createElement('script');s.async=true;s.setAttribute('data-goatcounter','https://stats.dr.eamer.dev/count');s.src='https://stats.dr.eamer.dev/count.js';document.body.appendChild(s);}</script>
 </body>
 </html>

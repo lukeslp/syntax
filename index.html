@@ -15,14 +15,14 @@
 <meta property="og:title" content="Syntax Tree">
 <meta property="og:description" content="Make a phrase-structure diagram for any sentence.">
 <meta property="og:url" content="https://datapoems.io/datavis/syntax/">
-<meta property="og:image" content="https://datapoems.io/syntax/social-card-board.png">
-<meta property="og:image:width" content="1200">
-<meta property="og:image:height" content="630">
+<meta property="og:image" content="https://datapoems.io/datavis/syntax/social-card-midnight.png">
+<meta property="og:image:width" content="2400">
+<meta property="og:image:height" content="1260">
 <meta property="og:image:type" content="image/png">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Syntax Tree">
 <meta name="twitter:description" content="Make a phrase-structure diagram for any sentence.">
-<meta name="twitter:image" content="https://datapoems.io/syntax/social-card-board.png">
+<meta name="twitter:image" content="https://datapoems.io/datavis/syntax/social-card-midnight.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Gloria+Hallelujah&family=Permanent+Marker&display=swap" rel="stylesheet">
@@ -866,12 +866,15 @@
     return -1;
   }
   var params;try{params=new URLSearchParams(location.search);}catch(e){params=null;}
-  if(params&&params.get('bare')==='1')document.body.classList.add('bare');
+  var previewOnly=!!(params&&params.get('bare')==='1');
+  if(previewOnly)document.body.classList.add('bare');
+  // Midnight is a card-capture palette, not an interactive diagram style.
+  if(!previewOnly)THEMES=THEMES.filter(function(t){return t.name!=='midnight';});
   var initialQuery=params?(params.get('q')||''):'';
   var sharedTheme=params?(params.get('theme')||''):'';
   var currentText='', currentTokens=[], posOverrides=parsePosOverrides(params?(params.get('pos')||''):'');
   var themeIndex=themeIndexByName(sharedTheme);
-  if(themeIndex<0)themeIndex=Math.floor(Math.random()*THEMES.length);
+  if(themeIndex<0)themeIndex=themeIndexByName('paper');
   function parsePosOverrides(raw){
     var out={};
     (raw||'').split(',').forEach(function(part){

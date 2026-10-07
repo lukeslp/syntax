@@ -25,9 +25,11 @@ the tagger read as a verb and watch the tree redraw.
 - **Type** a sentence and press Enter, or pick one of the 25 example
   sentences. Each example is a button, so Tab reaches them.
 - **Surprise me** diagrams a random example.
-- **Change diagram style** cycles six looks: board, chalk, marker, paper,
-  sharpie, and midnight. `?theme=board` (or any of the six) opens the app in
-  that style.
+- **Change diagram style** cycles five original looks: board, chalk, marker,
+  paper, and sharpie. Paper is the default; older `?theme=midnight` links also
+  open Paper. A named link such as `?theme=board` preserves that style.
+  Midnight remains available only for `?bare=1&theme=midnight` card captures;
+  the blue tile and social previews do not change the interactive styling.
 - **Download tree PNG** exports the current diagram at social-card size.
 - **Share this sentence** uses the Web Share API where the browser has it, and
   copies a link otherwise. Shared links open through `share/<theme>/`, which
@@ -71,8 +73,8 @@ server. Any static server works; the app is `index.html` plus `vendor/`.
 | `social-card-*.png` | Preview cards, one per style |
 | `og.html` | Renders the preview cards for a screenshot pass |
 
-The deployed site serves this repository's root directly, so the `index.html`
-here is the file that is live.
+Production serves `/home/coolhand/www/datapoems.io/datavis/syntax/`.
+Keep its `index.html` byte-identical to this source; both repositories track it.
 
 ## License
 

@@ -39,6 +39,7 @@
     font-family:'Atkinson Hyperlegible',ui-sans-serif,system-ui,sans-serif;
     display:flex;flex-direction:column;
   }
+  main{flex:1;min-height:0;display:flex;flex-direction:column;}
   body.fx-chalk .tag,body.fx-chalk .word,body.fx-chalk .sentence{font-family:'Gloria Hallelujah',cursive;}
   body.fx-marker .tag,body.fx-marker .word,body.fx-marker .sentence,
   body.fx-board .tag,body.fx-board .word,body.fx-board .sentence,
@@ -745,22 +746,10 @@
     if(ta>sa){ var h=baseVB.w/sa; full={x:baseVB.x,y:baseVB.y-(h-baseVB.h)/2,w:baseVB.w,h:h}; }
     else     { var w=baseVB.h*sa; full={x:baseVB.x-(w-baseVB.w)/2,y:baseVB.y,w:w,h:baseVB.h}; }
     var wholeFitW=full.w;
-    var mobile=sw<700, huge=baseVB.w>sw*4||baseVB.h>sh*3||ta>sa*5, veryLarge=baseVB.w>sw*2||baseVB.h>sh*2||ta>sa*3;
-    if(mobile&&huge){
-      var transcriptLike=currentTokens.length>50||baseVB.h>sh*3.2||ta>sa*9;
-      if(transcriptLike){
-        var transcriptH=baseVB.h*.92, transcriptW=transcriptH*sa, tx=baseVB.x+baseVB.w/2, ty=baseVB.y+baseVB.h/2;
-        full={x:tx-transcriptW/2,y:ty-transcriptH/2,w:transcriptW,h:transcriptH};
-      }else{
-        var midH=baseVB.h*1.16, midW=midH*sa, mx=baseVB.x+baseVB.w/2, my=baseVB.y+baseVB.h/2;
-        full={x:mx-midW/2,y:my-midH/2,w:midW,h:midH};
-      }
-    }else if(mobile&&currentTokens.length>5&&ta>sa*1.45){
-      var readableH=Math.max(baseVB.h*1.25,baseVB.w/(sa*1.1)), readableW=readableH*sa, cx=baseVB.x+baseVB.w/2, cy=baseVB.y+baseVB.h/2;
-      full={x:cx-readableW/2,y:cy-readableH/2,w:readableW,h:readableH};
-    }else{
-      full=expandBox(full,mobile?(veryLarge?1.28:1.38):(veryLarge?1.18:1.04));
-    }
+    var mobile=sw<700, veryLarge=baseVB.w>sw*2||baseVB.h>sh*2||ta>sa*3;
+    // Fit the entire tree first, including wide trees on portrait screens.
+    // Pinch, wheel and drag remain available for inspecting individual words.
+    full=expandBox(full,mobile?(veryLarge?1.28:1.38):(veryLarge?1.18:1.04));
     fitW=Math.max(full.w,wholeFitW);
     setView(full);
   }
@@ -845,11 +834,12 @@
     var tree=toks.length?parseClause(toks):{tag:'S',children:[{tag:'X',word:text}]};
     currentText=text;
     currentTokens=toks;
-    draw(tree);
     var display='“'+text+'”';
     sentenceText.textContent=display;
     sentenceFull.textContent=display;
-    window.requestAnimationFrame(updateSentenceOverflow);
+    // Measure the stage after the sentence footer has taken its final height.
+    updateSentenceOverflow();
+    draw(tree);
     sr.textContent='Parsed: '+text;
   }
 

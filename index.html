@@ -16,14 +16,14 @@
 <meta property="og:title" content="Syntax Tree">
 <meta property="og:description" content="Make a phrase-structure diagram for any sentence.">
 <meta property="og:url" content="https://datapoems.io/datavis/syntax/">
-<meta property="og:image" content="https://datapoems.io/syntax/social-card-board.png">
-<meta property="og:image:width" content="1200">
-<meta property="og:image:height" content="630">
+<meta property="og:image" content="https://datapoems.io/datavis/syntax/social-card-midnight.png">
+<meta property="og:image:width" content="2400">
+<meta property="og:image:height" content="1260">
 <meta property="og:image:type" content="image/png">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Syntax Tree">
 <meta name="twitter:description" content="Make a phrase-structure diagram for any sentence.">
-<meta name="twitter:image" content="https://datapoems.io/syntax/social-card-board.png">
+<meta name="twitter:image" content="https://datapoems.io/datavis/syntax/social-card-midnight.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Gloria+Hallelujah&family=Permanent+Marker&display=swap" rel="stylesheet">
@@ -40,7 +40,7 @@
     font-family:'Atkinson Hyperlegible',ui-sans-serif,system-ui,sans-serif;
     display:flex;flex-direction:column;
   }
-  main{display:flex;flex-direction:column;flex:1;min-height:0;}
+  main{flex:1;min-height:0;display:flex;flex-direction:column;}
   body.fx-chalk .tag,body.fx-chalk .word,body.fx-chalk .sentence{font-family:'Gloria Hallelujah',cursive;}
   body.fx-marker .tag,body.fx-marker .word,body.fx-marker .sentence,
   body.fx-board .tag,body.fx-board .word,body.fx-board .sentence,
@@ -747,22 +747,10 @@
     if(ta>sa){ var h=baseVB.w/sa; full={x:baseVB.x,y:baseVB.y-(h-baseVB.h)/2,w:baseVB.w,h:h}; }
     else     { var w=baseVB.h*sa; full={x:baseVB.x-(w-baseVB.w)/2,y:baseVB.y,w:w,h:baseVB.h}; }
     var wholeFitW=full.w;
-    var mobile=sw<700, huge=baseVB.w>sw*4||baseVB.h>sh*3||ta>sa*5, veryLarge=baseVB.w>sw*2||baseVB.h>sh*2||ta>sa*3;
-    if(mobile&&huge){
-      var transcriptLike=currentTokens.length>50||baseVB.h>sh*3.2||ta>sa*9;
-      if(transcriptLike){
-        var transcriptH=baseVB.h*.92, transcriptW=transcriptH*sa, tx=baseVB.x+baseVB.w/2, ty=baseVB.y+baseVB.h/2;
-        full={x:tx-transcriptW/2,y:ty-transcriptH/2,w:transcriptW,h:transcriptH};
-      }else{
-        var midH=baseVB.h*1.16, midW=midH*sa, mx=baseVB.x+baseVB.w/2, my=baseVB.y+baseVB.h/2;
-        full={x:mx-midW/2,y:my-midH/2,w:midW,h:midH};
-      }
-    }else if(mobile&&currentTokens.length>5&&ta>sa*1.45){
-      var readableH=Math.max(baseVB.h*1.25,baseVB.w/(sa*1.1)), readableW=readableH*sa, cx=baseVB.x+baseVB.w/2, cy=baseVB.y+baseVB.h/2;
-      full={x:cx-readableW/2,y:cy-readableH/2,w:readableW,h:readableH};
-    }else{
-      full=expandBox(full,mobile?(veryLarge?1.28:1.38):(veryLarge?1.18:1.04));
-    }
+    var mobile=sw<700, veryLarge=baseVB.w>sw*2||baseVB.h>sh*2||ta>sa*3;
+    // Fit the entire tree first, including wide trees on portrait screens.
+    // Pinch, wheel and drag remain available for inspecting individual words.
+    full=expandBox(full,mobile?(veryLarge?1.28:1.38):(veryLarge?1.18:1.04));
     fitW=Math.max(full.w,wholeFitW);
     setView(full);
   }
@@ -847,11 +835,12 @@
     var tree=toks.length?parseClause(toks):{tag:'S',children:[{tag:'X',word:text}]};
     currentText=text;
     currentTokens=toks;
-    draw(tree);
     var display='“'+text+'”';
     sentenceText.textContent=display;
     sentenceFull.textContent=display;
-    window.requestAnimationFrame(updateSentenceOverflow);
+    // Measure the stage after the sentence footer has taken its final height.
+    updateSentenceOverflow();
+    draw(tree);
     sr.textContent='Parsed: '+text;
   }
 
@@ -868,12 +857,15 @@
     return -1;
   }
   var params;try{params=new URLSearchParams(location.search);}catch(e){params=null;}
-  if(params&&params.get('bare')==='1')document.body.classList.add('bare');
+  var previewOnly=!!(params&&params.get('bare')==='1');
+  if(previewOnly)document.body.classList.add('bare');
+  // Midnight is a card-capture palette, not an interactive diagram style.
+  if(!previewOnly)THEMES=THEMES.filter(function(t){return t.name!=='midnight';});
   var initialQuery=params?(params.get('q')||''):'';
   var sharedTheme=params?(params.get('theme')||''):'';
   var currentText='', currentTokens=[], posOverrides=parsePosOverrides(params?(params.get('pos')||''):'');
   var themeIndex=themeIndexByName(sharedTheme);
-  if(themeIndex<0)themeIndex=Math.floor(Math.random()*THEMES.length);
+  if(themeIndex<0)themeIndex=themeIndexByName('paper');
   function parsePosOverrides(raw){
     var out={};
     (raw||'').split(',').forEach(function(part){
@@ -1338,5 +1330,6 @@
   boot();
 })();
 </script>
+<script>if(window.self===window.top){var s=document.createElement('script');s.async=true;s.setAttribute('data-goatcounter','https://stats.dr.eamer.dev/count');s.src='https://stats.dr.eamer.dev/count.js';document.body.appendChild(s);}</script>
 </body>
 </html>

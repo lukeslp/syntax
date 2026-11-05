@@ -27,9 +27,10 @@ the tagger read as a verb and watch the tree redraw.
 - **Type** a sentence and press Enter, or pick one of the 25 example
   sentences. Each example is a button, so Tab reaches them.
 - **Surprise me** diagrams a random example.
-- **Change diagram style** cycles six looks: board, chalk, marker, paper,
-  sharpie, and midnight. `?theme=board` (or any of the six) opens the app in
-  that style.
+- **Change diagram style** cycles five interactive looks: board, chalk, marker,
+  paper, and sharpie. Paper is the default, including older `?theme=midnight`
+  links. Midnight remains available for `?bare=1&theme=midnight` card captures.
+  A named link such as `?theme=board` preserves that interactive style.
 - **Download tree PNG** exports the current diagram at social-card size.
 - **Share this sentence** uses the Web Share API where the browser has it, and
   copies a link otherwise. Shared links open through `share/<theme>/`, which
@@ -52,7 +53,8 @@ keep everything else.
 4. [rough.js](https://roughjs.com/) draws the branches and labels so the
    result looks drawn by hand, with a different roughness per style.
 
-Parsing and drawing run in the browser. There are no analytics scripts.
+Parsing and drawing run in the browser. The canonical hosted app retains its
+GoatCounter page-analytics loader; an isolated test must block external requests.
 Fonts load from Google Fonts; system fonts are used if that service is
 unavailable. Pages suppress the referrer header on outgoing requests.
 
@@ -93,7 +95,7 @@ address. The hosted demo may use an earlier commit than this repository.
 Bug reports are most useful with a short example sentence, the expected
 diagram, and your browser/version. Use an invented sentence rather than
 private classroom or personal material. Before proposing a change, check
-typing, example selection, all six styles, shared-link reloads, and PNG export
+typing, example selection, all five interactive styles and the bare Midnight preview, shared-link reloads, and PNG export
 at both phone and desktop widths. The grammar is intentionally simplified;
 explain the interpretation your parser change improves.
 
@@ -101,3 +103,14 @@ explain the interpretation your parser change improves.
 
 The application is MIT licensed. See [LICENSE](LICENSE). Bundled dependencies
 retain their own [MIT copyright notices and version records](vendor/README.md).
+
+## Source reconciliation and hosting ownership
+
+The Drummer development source is `/home/coolhand/projects/syntax`; the served
+artifact is `/home/coolhand/www/datapoems.io/datavis/syntax/`. Their observed
+HTML and local vendor bytes matched before this candidate. This integration
+retains the live Paper default, full-height initial fit and preview-only Midnight
+behavior, while preserving upstream local dependency notices, referrer protection
+and relative share paths for independent hosting. No server artifact is changed
+by a source commit. Review the selected files before a separately authorized
+publication; do not run a whole-tree sync against a served directory.

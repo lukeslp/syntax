@@ -104,13 +104,12 @@ explain the interpretation your parser change improves.
 The application is MIT licensed. See [LICENSE](LICENSE). Bundled dependencies
 retain their own [MIT copyright notices and version records](vendor/README.md).
 
-## Source reconciliation and hosting ownership
+## Hosting
 
-The Drummer development source is `/home/coolhand/projects/syntax`; the served
-artifact is `/home/coolhand/www/datapoems.io/datavis/syntax/`. Their observed
-HTML and local vendor bytes matched before this candidate. This integration
-retains the live Paper default, full-height initial fit and preview-only Midnight
-behavior, while preserving upstream local dependency notices, referrer protection
-and relative share paths for independent hosting. No server artifact is changed
-by a source commit. Review the selected files before a separately authorized
-publication; do not run a whole-tree sync against a served directory.
+A hosted copy runs at https://datapoems.io/datavis/syntax/. It is published
+from this source in a separate step, so a commit here does not change it.
+
+This version keeps Paper as the default theme, fits the first tree to the full
+height of the page, and uses Midnight only for previews. It also keeps the
+local dependency notices, referrer protection and relative share paths, so the
+page can be hosted anywhere.

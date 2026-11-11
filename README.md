@@ -4,6 +4,7 @@ Type a sentence and watch its phrase-structure tree draw itself downward, in
 the hand of a whiteboard marker. Browser-only, one HTML file, no build step,
 no language model.
 
+[![Live](https://img.shields.io/badge/live-datapoems.io-4ad7d1?style=flat-square)](https://datapoems.io/datavis/syntax/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue?style=flat-square)](LICENSE)
 
 [Try Syntax Tree](https://datapoems.io/datavis/syntax/) · [Luke Steuber](https://lukesteuber.com/)
